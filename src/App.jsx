@@ -170,14 +170,17 @@ export const App = () => {
   useLayoutEffect(handleSubmit, []);
 
   return (
-    <div className="p-8 lg:p-16">
-      <div className="text-zinc-400 text-xl mb-8 text-center">
+    <div className="p-4 lg:p-16">
+      <div className="text-zinc-400 text-xl mb-4 lg:mb-8 text-center">
         Mortgage Calculator
       </div>
       <div className="flex justify-center">
         <div className="flex flex-col lg:flex-row justify-center gap-8 max-w-[1400px]">
           <div className="flex flex-col gap-8 flex-1 h-fit">
-            <form className="p-8 __border rounded" onSubmit={handleSubmit}>
+            <form
+              className="p-4 lg:p-8 __border rounded"
+              onSubmit={handleSubmit}
+            >
               <div className="flex flex-col gap-2 text-sm mb-8">
                 <div className="flex gap-4">
                   <div className="flex flex-col flex-[3]">
@@ -231,7 +234,7 @@ export const App = () => {
             </form>
           </div>
           <div className="flex flex-col gap-8 flex-[2]">
-            <div className="p-8 __border rounded">
+            <div className="p-4 lg:p-8 __border rounded h-[300px] lg:h-[500px]">
               <canvas
                 ref={canvasRef}
                 width="800"
