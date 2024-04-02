@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  src: url('./assets/Montserrat-VariableFont_wght.ttf') format('opentype');
+}
+
+body {
+  @apply dark:text-zinc-200 bg-white dark:bg-zinc-900;
+  font-family: 'Montserrat', Helvetica, sans-serif;
+}
+
+.__border {
+  @apply border border-zinc-300 dark:border-zinc-500;
+}
