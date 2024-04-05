@@ -2,6 +2,8 @@ import React, { useLayoutEffect, useRef } from 'react';
 import { proxy, useSnapshot } from 'valtio';
 import Chart from 'chart.js/auto';
 
+const EPSILON = 0.01;
+
 const state = proxy({
   loanAmount: '300000',
   interest: '7',
@@ -10,6 +12,7 @@ const state = proxy({
   results: {
     monthlyPayment: null,
     totalPaid: null,
+    tableData: null,
   },
 });
 
@@ -73,7 +76,7 @@ function handleInterestChange(event) {
   state.interest = event.target.value;
 }
 
-function calculate(loanAmount, interest, loanTerm) {
+function calculate(loanAmount, interest, loanTerm, extraPrincipal = 0) {
   const termYears = { 0: 30, 1: 15 }[loanTerm];
   const termMonths = termYears * 12;
 
@@ -85,44 +88,79 @@ function calculate(loanAmount, interest, loanTerm) {
   const b = Math.pow(1 + i, termMonths) - 1;
   const monthlyPayment = (loanAmount * a) / b;
 
-  // Calculate the different amounts paid towards principal and interest for
-  // each month.
   let principal = loanAmount;
   let totalPaid = 0;
 
+  const payments = [];
+
+  while (principal > EPSILON) {
+    const monthlyPayments = [];
+
+    for (let j = 0; j < 12; j++) {
+      let interestPayment = (principal * interest) / 12;
+      let principalPayment = monthlyPayment - interestPayment + extraPrincipal;
+
+      if (principal - principalPayment <= EPSILON) {
+        principalPayment = principalPayment - principal;
+        principal = 0;
+      } else {
+        principal -= principalPayment;
+      }
+
+      totalPaid += interestPayment + principalPayment;
+
+      monthlyPayments.push({
+        interestPayment,
+        principalPayment,
+        principal,
+        totalPaid,
+      });
+
+      if (principal <= EPSILON) {
+        break;
+      }
+    }
+
+    payments.push(monthlyPayments);
+  }
+
   const chartData = {
-    labels: [...Array(termYears)].map((_, index) => index + 1),
+    labels: payments.map((_, index) => index + 1),
     datasets: [
       { label: 'Interest', data: [] },
       { label: 'Principal', data: [] },
     ],
   };
+  const tableData = [];
 
-  for (let i = 0; i < termYears; i++) {
-    let interestPayments = 0;
-    let principalPayments = 0;
+  payments.forEach((monthlyPayments) => {
+    let yearInterest = 0;
+    let yearPrincipal = 0;
 
-    for (let j = 0; j < 12; j++) {
-      const interestPayment = (principal * interest) / 12;
-      const principalPayment = monthlyPayment - interestPayment;
+    monthlyPayments.forEach((payment) => {
+      yearInterest += payment.interestPayment;
+      yearPrincipal += payment.principalPayment;
+    });
 
-      principal -= principalPayment;
-      totalPaid += interestPayment + principalPayment;
+    chartData.datasets[0].data.push(yearInterest / monthlyPayments.length);
+    chartData.datasets[1].data.push(yearPrincipal / monthlyPayments.length);
 
-      interestPayments += interestPayment;
-      principalPayments += principalPayment;
-    }
-    const averageInterestPayment = interestPayments / 12;
-    const averagePrincipalPayment = principalPayments / 12;
+    const lastPrincipal =
+      monthlyPayments[monthlyPayments.length - 1]?.principal;
 
-    chartData.datasets[0].data.push(averageInterestPayment);
-    chartData.datasets[1].data.push(averagePrincipalPayment);
-  }
+    tableData.push({
+      interest: currencyFormatter.format(Math.round(yearInterest)),
+      principal: currencyFormatter.format(Math.round(yearPrincipal)),
+      principalBalance:
+        currencyFormatter.format(Math.round(lastPrincipal)) ?? 0,
+    });
+  });
 
   return {
     monthlyPayment: currencyFormatter.format(Math.round(monthlyPayment)),
     totalPaid: currencyFormatter.format(Math.round(totalPaid)),
     chartData,
+    tableData,
   };
 }
 
@@ -143,7 +181,7 @@ export const App = () => {
       state.error = 'Interest is invalid';
     } else {
       state.error = '';
-      const { monthlyPayment, totalPaid, chartData } = calculate(
+      const { monthlyPayment, totalPaid, chartData, tableData } = calculate(
         loanAmount,
         interest,
         state.loanTerm
@@ -151,6 +189,7 @@ export const App = () => {
 
       state.results.monthlyPayment = monthlyPayment;
       state.results.totalPaid = totalPaid;
+      state.results.tableData = tableData;
 
       if (!chartRef.current) {
         const ctx = canvasRef.current.getContext('2d');
@@ -234,6 +273,20 @@ export const App = () => {
             </form>
           </div>
           <div className="flex flex-col gap-8 flex-[2]">
+            <div className="flex gap-8">
+              <div className="py-4 flex-1 text-center __border rounded">
+                <div className="text-sm">Monthly payment</div>
+                <div className="text-lg font-bold">
+                  {snap.results.monthlyPayment}
+                </div>
+              </div>
+              <div className="py-4 flex-1 text-center __border rounded">
+                <div className="text-sm">Total paid</div>
+                <div className="text-lg font-bold">
+                  {snap.results.totalPaid}
+                </div>
+              </div>
+            </div>
             <div className="p-4 lg:p-8 __border rounded h-[300px] lg:h-[500px]">
               <canvas
                 ref={canvasRef}
@@ -242,19 +295,40 @@ export const App = () => {
                 className="max-w-full"
               />
             </div>
-            <div className="flex gap-4">
-              <div>
-                <div className="text-sm">Monthly payment</div>
-                <div className="text-lg font-bold">
-                  {snap.results.monthlyPayment}
-                </div>
-              </div>
-              <div>
-                <div className="text-sm">Total paid</div>
-                <div className="text-lg font-bold">
-                  {snap.results.totalPaid}
-                </div>
-              </div>
+            <div className="p-4 lg:p-8 __border rounded">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-left">
+                    <th className="px-2 py-1">Year</th>
+                    <th className="px-2 py-1">Interest</th>
+                    <th className="px-2 py-1">Principal</th>
+                    <th className="px-2 py-1">Ending Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {snap.results.tableData?.map(
+                    ({ interest, principal, principalBalance }, index) => (
+                      <tr
+                        key={index}
+                        className="first-of-type:border-t border-b border-zinc-300 dark:border-zinc-500"
+                      >
+                        <td className="px-2 py-1 first-of-type:border-l border-r border-zinc-300 dark:border-zinc-500">
+                          {index + 1}
+                        </td>
+                        <td className="px-2 py-1 first-of-type:border-l border-r border-zinc-300 dark:border-zinc-500">
+                          {interest}
+                        </td>
+                        <td className="px-2 py-1 first-of-type:border-l border-r border-zinc-300 dark:border-zinc-500">
+                          {principal}
+                        </td>
+                        <td className="px-2 py-1 first-of-type:border-l border-r border-zinc-300 dark:border-zinc-500">
+                          {principalBalance}
+                        </td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
