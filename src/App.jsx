@@ -38,8 +38,8 @@ const chartConfig = {
           title: ([value]) => {
             return `Year ${value.label}`;
           },
-          label: ({ raw }) => {
-            return ` $${raw.toFixed(2)}`;
+          label: ({ dataset, raw }) => {
+            return ` ${dataset.label} - $${raw.toFixed(2)}`;
           },
         },
       },
@@ -293,7 +293,7 @@ export const App = () => {
             </form>
           </div>
           <div className="flex flex-col gap-8 flex-[2]">
-            <div className="flex gap-8">
+            <div className="flex flex-col sm:flex-row gap-8">
               <div className="py-4 flex-1 text-center __border rounded">
                 <div className="text-sm">Monthly payment</div>
                 <div className="text-lg font-bold">
@@ -325,10 +325,18 @@ export const App = () => {
               <table className="w-full">
                 <thead>
                   <tr className="text-left">
-                    <th className="px-2 py-1">Year</th>
-                    <th className="px-2 py-1">Interest</th>
-                    <th className="px-2 py-1">Principal</th>
-                    <th className="px-2 py-1">Ending Balance</th>
+                    <th className="px-2 py-1 first-of-type:border-l border-r border-t border-zinc-300 dark:border-zinc-500">
+                      Year
+                    </th>
+                    <th className="px-2 py-1 first-of-type:border-l border-r border-t border-zinc-300 dark:border-zinc-500">
+                      Interest
+                    </th>
+                    <th className="px-2 py-1 first-of-type:border-l border-r border-t border-zinc-300 dark:border-zinc-500">
+                      Principal
+                    </th>
+                    <th className="px-2 py-1 first-of-type:border-l border-r border-t border-zinc-300 dark:border-zinc-500">
+                      Ending Balance
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
