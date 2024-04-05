@@ -8,10 +8,12 @@ const state = proxy({
   loanAmount: '300000',
   interest: '7',
   loanTerm: '0',
+  extraMonthlyPayment: '0',
   error: null,
   results: {
     monthlyPayment: null,
     totalPaid: null,
+    totalYears: null,
     tableData: null,
   },
 });
@@ -64,16 +66,20 @@ const chartConfig = {
   },
 };
 
-function handleAmountChange(event) {
-  state.loanAmount = event.target.value;
+function handleAmountChange({ target }) {
+  state.loanAmount = target.value;
 }
 
-function handleTermChange(event) {
-  state.loanTerm = event.target.value;
+function handleTermChange({ target }) {
+  state.loanTerm = target.value;
 }
 
-function handleInterestChange(event) {
-  state.interest = event.target.value;
+function handleInterestChange({ target }) {
+  state.interest = target.value;
+}
+
+function handleExtraMonthlyPaymentChange({ target }) {
+  state.extraMonthlyPayment = target.value;
 }
 
 function calculate(loanAmount, interest, loanTerm, extraPrincipal = 0) {
@@ -98,16 +104,18 @@ function calculate(loanAmount, interest, loanTerm, extraPrincipal = 0) {
 
     for (let j = 0; j < 12; j++) {
       let interestPayment = (principal * interest) / 12;
-      let principalPayment = monthlyPayment - interestPayment + extraPrincipal;
+      let principalPayment = monthlyPayment + extraPrincipal - interestPayment;
 
-      if (principal - principalPayment <= EPSILON) {
-        principalPayment = principalPayment - principal;
-        principal = 0;
-      } else {
-        principal -= principalPayment;
+      if (principal <= principalPayment) {
+        principalPayment = principal;
       }
 
+      principal -= principalPayment;
       totalPaid += interestPayment + principalPayment;
+
+      if (principal <= EPSILON) {
+        principal = 0;
+      }
 
       monthlyPayments.push({
         interestPayment,
@@ -120,8 +128,9 @@ function calculate(loanAmount, interest, loanTerm, extraPrincipal = 0) {
         break;
       }
     }
-
-    payments.push(monthlyPayments);
+    if (monthlyPayments.length > 0) {
+      payments.push(monthlyPayments);
+    }
   }
 
   const chartData = {
@@ -146,19 +155,19 @@ function calculate(loanAmount, interest, loanTerm, extraPrincipal = 0) {
     chartData.datasets[1].data.push(yearPrincipal / monthlyPayments.length);
 
     const lastPrincipal =
-      monthlyPayments[monthlyPayments.length - 1]?.principal;
+      monthlyPayments[monthlyPayments.length - 1]?.principal ?? 0;
 
     tableData.push({
       interest: currencyFormatter.format(Math.round(yearInterest)),
       principal: currencyFormatter.format(Math.round(yearPrincipal)),
-      principalBalance:
-        currencyFormatter.format(Math.round(lastPrincipal)) ?? 0,
+      principalBalance: currencyFormatter.format(Math.round(lastPrincipal)),
     });
   });
 
   return {
     monthlyPayment: currencyFormatter.format(Math.round(monthlyPayment)),
     totalPaid: currencyFormatter.format(Math.round(totalPaid)),
+    totalYears: payments.length,
     chartData,
     tableData,
   };
@@ -174,21 +183,22 @@ export const App = () => {
 
     const loanAmount = Number(state.loanAmount);
     const interest = Number(state.interest) * 0.01;
+    const extraMonthlyPayment = Number(state.extraMonthlyPayment);
 
-    if (isNaN(loanAmount)) {
+    if (isNaN(loanAmount) || !loanAmount) {
       state.error = 'Loan amount is invalid';
-    } else if (isNaN(interest)) {
+    } else if (isNaN(interest) || !interest) {
       state.error = 'Interest is invalid';
+    } else if (isNaN(extraMonthlyPayment) || extraMonthlyPayment < 0) {
+      state.error = 'Extra monthly payment is invalid';
     } else {
       state.error = '';
-      const { monthlyPayment, totalPaid, chartData, tableData } = calculate(
-        loanAmount,
-        interest,
-        state.loanTerm
-      );
+      const { monthlyPayment, totalPaid, totalYears, chartData, tableData } =
+        calculate(loanAmount, interest, state.loanTerm, extraMonthlyPayment);
 
       state.results.monthlyPayment = monthlyPayment;
       state.results.totalPaid = totalPaid;
+      state.results.totalYears = totalYears;
       state.results.tableData = tableData;
 
       if (!chartRef.current) {
@@ -258,10 +268,20 @@ export const App = () => {
                     <option value="1">15 year fixed</option>
                   </select>
                 </div>
-                {snap.error && (
-                  <div className="text-red-400 mt-2">
-                    Loan amount is invalid
+                <div className="flex flex-col flex-[3]">
+                  <label className="text-zinc-400">Extra monthly payment</label>
+                  <div className="relative">
+                    <div className="absolute left-1 top-[5px]">$</div>
+                    <input
+                      type="text"
+                      className="bg-zinc-900 __border rounded pl-4 pr-2 py-1 w-full"
+                      value={snap.extraMonthlyPayment}
+                      onChange={handleExtraMonthlyPaymentChange}
+                    />
                   </div>
+                </div>
+                {snap.error && (
+                  <div className="text-red-400 mt-2">{snap.error}</div>
                 )}
               </div>
               <button
@@ -284,6 +304,12 @@ export const App = () => {
                 <div className="text-sm">Total paid</div>
                 <div className="text-lg font-bold">
                   {snap.results.totalPaid}
+                </div>
+              </div>
+              <div className="py-4 flex-1 text-center __border rounded">
+                <div className="text-sm">Total years</div>
+                <div className="text-lg font-bold">
+                  {snap.results.totalYears}
                 </div>
               </div>
             </div>
