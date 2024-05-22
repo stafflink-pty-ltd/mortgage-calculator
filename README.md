@@ -4,7 +4,7 @@ Super simple mortgage calculator.
 [View on GitHub Pages](https://dtgreene.github.io/mortgage-calculator/dist/)
 
 <p align="center">
-  <img width="1471" alt="Screenshot 2024-04-02 at 10 47 15 AM" src="https://github.com/dtgreene/mortgage-calculator/assets/24302976/3bfa1e9e-b1f5-40c2-9103-9efc2d27f0cf">
+  <img width="1196" alt="Screenshot 2024-05-22 at 1 42 42 PM" src="https://github.com/dtgreene/mortgage-calculator/assets/24302976/493fa078-086e-45f0-ba68-df014f0f4f35">
 </p>
 
 The following amortization formula is used:
