@@ -174,7 +174,10 @@ function calculate(loanAmount, interest, loanTerm, extraPrincipal = 0) {
 }
 
 export const App = () => {
-  const snap = useSnapshot(state);
+  // Since the snapshot state will be used for inputs, the sync option needs to
+  // be used to prevent the cursor from jumping around.
+  // https://github.com/pmndrs/valtio/issues/132
+  const snap = useSnapshot(state, { sync: true });
   const canvasRef = useRef();
   const chartRef = useRef();
 
