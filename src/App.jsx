@@ -1,12 +1,13 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import { proxy, useSnapshot } from 'valtio';
 import Chart from 'chart.js/auto';
+import * as bootstrap from 'bootstrap'
 
 const EPSILON = 0.01;
 
 const state = proxy({
-  loanAmount: '300000',
-  interest: '7',
+  loanAmount: '500000',
+  interest: '6.09',
   loanTerm: '0',
   extraMonthlyPayment: '0',
   error: null,
@@ -20,7 +21,7 @@ const state = proxy({
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
-  currency: 'USD',
+  currency: 'AUD',
   minimumFractionDigits: 0,
   maximumFractionDigits: 0,
 });
@@ -83,8 +84,8 @@ function handleExtraMonthlyPaymentChange({ target }) {
 }
 
 function calculate(loanAmount, interest, loanTerm, extraPrincipal = 0) {
-  const termYears = { 0: 30, 1: 15 }[loanTerm];
-  const termMonths = termYears * 12;
+  const termYears = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
+  const termMonths = termYears[loanTerm] * 12;
 
   // Amortization for monthly payments
   // Loan amount * [(i * (1 + i)²) / ((1 + i)² - 1)]
@@ -241,7 +242,7 @@ export const App = () => {
                       <div className="absolute left-1 top-[5px]">$</div>
                       <input
                         type="text"
-                        className="bg-zinc-900 __border rounded pl-4 pr-2 py-1 w-full"
+                        className="form-control"
                         value={snap.loanAmount}
                         onChange={handleAmountChange}
                       />
@@ -253,7 +254,7 @@ export const App = () => {
                       <div className="absolute right-1 top-[5px]">%</div>
                       <input
                         type="text"
-                        className="bg-zinc-900 __border rounded pr-4 pl-2 py-1 w-full"
+                        className="form-control"
                         value={snap.interest}
                         onChange={handleInterestChange}
                       />
@@ -263,12 +264,40 @@ export const App = () => {
                 <div className="flex flex-col">
                   <label className="text-zinc-400">Loan term</label>
                   <select
-                    className="bg-zinc-900 __border rounded px-2 py-1 w-full"
+                    className="form-control"
                     value={snap.loanTerm}
                     onChange={handleTermChange}
                   >
-                    <option value="0">30 year fixed</option>
-                    <option value="1">15 year fixed</option>
+                    <option value="29">30 years</option>
+                    <option value="28">29 years</option>
+                    <option value="27">28 years</option>
+                    <option value="26">27 years</option>
+                    <option value="25">26 years</option>
+                    <option value="24">25 years</option>
+                    <option value="23">24 years</option>
+                    <option value="22">23 years</option>
+                    <option value="21">22 years</option>
+                    <option value="20">21 years</option>
+                    <option value="19">20 years</option>
+                    <option value="18">19 years</option>
+                    <option value="17">18 years</option>
+                    <option value="16">17 years</option>
+                    <option value="15">16 years</option>
+                    <option value="14">15 years</option>
+                    <option value="13">14 years</option>
+                    <option value="12">13 years</option>
+                    <option value="11">12 years</option>
+                    <option value="10">11 years</option>
+                    <option value="9">10 years</option>
+                    <option value="8">9 years</option>
+                    <option value="7">8 years</option>
+                    <option value="6">7 years</option>
+                    <option value="5">6 years</option>
+                    <option value="4">5 years</option>
+                    <option value="3">4 years</option>
+                    <option value="2">3 years</option>
+                    <option value="1">2 years</option>
+                    <option value="0">1 year</option>
                   </select>
                 </div>
                 <div className="flex flex-col flex-[3]">
@@ -277,7 +306,7 @@ export const App = () => {
                     <div className="absolute left-1 top-[5px]">$</div>
                     <input
                       type="text"
-                      className="bg-zinc-900 __border rounded pl-4 pr-2 py-1 w-full"
+                      className="form-control"
                       value={snap.extraMonthlyPayment}
                       onChange={handleExtraMonthlyPaymentChange}
                     />
@@ -288,7 +317,7 @@ export const App = () => {
                 )}
               </div>
               <button
-                className="bg-gradient-to-r from-cyan-500 to-blue-500 rounded p-2 hover:opacity-60 transition-opacity w-full text-lg"
+                className="btn btn-primary"
                 type="submit"
               >
                 Calculate
