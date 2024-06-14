@@ -223,181 +223,185 @@ export const App = () => {
   useLayoutEffect(handleSubmit, []);
 
   return (
-    <div className="container pt-5">
-      <div class="row">
-        <div class="col">
-          <h1>Mortgage Calculator</h1>
-        </div>
-      </div>
-      <div className="row">
-        <div className="flex flex-col lg:flex-row justify-center gap-8 max-w-[1400px]">
-          <div className="flex flex-col gap-8 flex-1 h-fit">
-            <form onSubmit={handleSubmit}>
-              <div className="flex flex-col gap-2 text-sm mb-8">
-                <div className="flex gap-4">
-                  <div className="flex flex-col flex-[3]">
-                    <label className="form-label">Loan amount</label>
-                    <div className="relative">
-                      <div className="absolute left-1 top-[5px]">$</div>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={snap.loanAmount}
-                        onChange={handleAmountChange}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-col flex-1">
-                    <label className="form-label">Interest</label>
-                    <div className="relative">
-                      <div className="absolute right-1 top-[5px]">%</div>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={snap.interest}
-                        onChange={handleInterestChange}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-col">
-                  <label className="text-zinc-400">Loan term</label>
-                  <select
-                    className="form-control"
-                    value={snap.loanTerm}
-                    onChange={handleTermChange}
-                  >
-                    <option value="29">30 years</option>
-                    <option value="28">29 years</option>
-                    <option value="27">28 years</option>
-                    <option value="26">27 years</option>
-                    <option value="25">26 years</option>
-                    <option value="24">25 years</option>
-                    <option value="23">24 years</option>
-                    <option value="22">23 years</option>
-                    <option value="21">22 years</option>
-                    <option value="20">21 years</option>
-                    <option value="19">20 years</option>
-                    <option value="18">19 years</option>
-                    <option value="17">18 years</option>
-                    <option value="16">17 years</option>
-                    <option value="15">16 years</option>
-                    <option value="14">15 years</option>
-                    <option value="13">14 years</option>
-                    <option value="12">13 years</option>
-                    <option value="11">12 years</option>
-                    <option value="10">11 years</option>
-                    <option value="9">10 years</option>
-                    <option value="8">9 years</option>
-                    <option value="7">8 years</option>
-                    <option value="6">7 years</option>
-                    <option value="5">6 years</option>
-                    <option value="4">5 years</option>
-                    <option value="3">4 years</option>
-                    <option value="2">3 years</option>
-                    <option value="1">2 years</option>
-                    <option value="0">1 year</option>
-                  </select>
-                </div>
-                <div className="flex flex-col flex-[3]">
-                  <label className="text-zinc-400">Extra monthly payment</label>
-                  <div className="relative">
-                    <div className="absolute left-1 top-[5px]">$</div>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={snap.extraMonthlyPayment}
-                      onChange={handleExtraMonthlyPaymentChange}
-                    />
-                  </div>
-                </div>
-                {snap.error && (
-                  <div className="text-red-400 mt-2">{snap.error}</div>
-                )}
-              </div>
-              <button
-                className="btn btn-primary"
-                type="submit"
-              >
-                Calculate
-              </button>
-            </form>
-          </div>
-          <div className="flex flex-col gap-8 flex-[2]">
-            <div className="flex flex-col sm:flex-row gap-8">
-              <div className="py-4 flex-1 text-center __border rounded">
-                <div className="text-sm">Monthly payment</div>
-                <div className="text-lg font-bold">
-                  {snap.results.monthlyPayment}
-                </div>
-              </div>
-              <div className="py-4 flex-1 text-center __border rounded">
-                <div className="text-sm">Total paid</div>
-                <div className="text-lg font-bold">
-                  {snap.results.totalPaid}
-                </div>
-              </div>
-              <div className="py-4 flex-1 text-center __border rounded">
-                <div className="text-sm">Total years</div>
-                <div className="text-lg font-bold">
-                  {snap.results.totalYears}
-                </div>
-              </div>
-            </div>
-            <div className="p-4 lg:p-8 __border rounded h-[300px] lg:h-[500px]">
-              <canvas
-                ref={canvasRef}
-                width="800"
-                height="400"
-                className="max-w-full"
-              />
-            </div>
-            <div className="p-4 lg:p-8 __border rounded">
-              <table className="w-full">
-                <thead>
-                  <tr className="text-left">
-                    <th className="px-2 py-1 first-of-type:border-l border-r border-t border-zinc-300 dark:border-zinc-500">
-                      Year
-                    </th>
-                    <th className="px-2 py-1 first-of-type:border-l border-r border-t border-zinc-300 dark:border-zinc-500">
-                      Interest
-                    </th>
-                    <th className="px-2 py-1 first-of-type:border-l border-r border-t border-zinc-300 dark:border-zinc-500">
-                      Principal
-                    </th>
-                    <th className="px-2 py-1 first-of-type:border-l border-r border-t border-zinc-300 dark:border-zinc-500">
-                      Ending Balance
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {snap.results.tableData?.map(
-                    ({ interest, principal, principalBalance }, index) => (
-                      <tr
-                        key={index}
-                        className="first-of-type:border-t border-b border-zinc-300 dark:border-zinc-500"
-                      >
-                        <td className="px-2 py-1 first-of-type:border-l border-r border-zinc-300 dark:border-zinc-500">
-                          {index + 1}
-                        </td>
-                        <td className="px-2 py-1 first-of-type:border-l border-r border-zinc-300 dark:border-zinc-500">
-                          {interest}
-                        </td>
-                        <td className="px-2 py-1 first-of-type:border-l border-r border-zinc-300 dark:border-zinc-500">
-                          {principal}
-                        </td>
-                        <td className="px-2 py-1 first-of-type:border-l border-r border-zinc-300 dark:border-zinc-500">
-                          {principalBalance}
-                        </td>
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+		<main class="my-3">
+			<section class="py-5">
+				<div class="container">
+					<div class="row">
+						<div class="col-lg-12">
+							<h1 class="h5 text-center pb-2 mb-4">Mortgage Calculator</h1>
+						</div>
+					</div>
+					<div class="row gy-4">
+						<div class="col-lg-4">
+							<div class="card p-4">
+								<form onSubmit={handleSubmit}>
+									<div class="row gx-3 gy-3">
+										<div class="col-md-8">
+											<div class="form-group">
+												<label class="form-label small mb-1">Loan amount</label>
+												<div class="position-relative d-flex align-items-center">
+													<span class="position-absolute small ms-2 ps-1">$</span>
+													<input
+														type="text"
+														class="form-control-sm border-1 border-grey mw-100 w-100 ps-4"
+														value={snap.loanAmount}
+														onChange={handleAmountChange}
+													/>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-4">
+											<div class="form-group">
+												<label class="form-label small mb-1">Interest</label>
+												<div class="position-relative d-flex align-items-center">
+													<span class="position-absolute small end-0 me-2 pe-1">%</span>
+													<input
+														type="text"
+														class="form-control-sm border-1 border-grey mw-100 w-100 pe-4"
+														value={snap.interest}
+														onChange={handleInterestChange}
+													/>
+												</div>
+											</div>
+										</div>
+										<div class="col-12">
+											<div class="form-group">
+												<label class="form-label small mb-1">Loan term</label>
+												<div>
+													<select
+														class="form-control-sm border-1 border-grey mw-100 w-100"
+														value={snap.loanTerm}
+														onChange={handleTermChange}
+													>
+														<option value="29">30 years</option>
+														<option value="28">29 years</option>
+														<option value="27">28 years</option>
+														<option value="26">27 years</option>
+														<option value="25">26 years</option>
+														<option value="24">25 years</option>
+														<option value="23">24 years</option>
+														<option value="22">23 years</option>
+														<option value="21">22 years</option>
+														<option value="20">21 years</option>
+														<option value="19">20 years</option>
+														<option value="18">19 years</option>
+														<option value="17">18 years</option>
+														<option value="16">17 years</option>
+														<option value="15">16 years</option>
+														<option value="14">15 years</option>
+														<option value="13">14 years</option>
+														<option value="12">13 years</option>
+														<option value="11">12 years</option>
+														<option value="10">11 years</option>
+														<option value="9">10 years</option>
+														<option value="8">9 years</option>
+														<option value="7">8 years</option>
+														<option value="6">7 years</option>
+														<option value="5">6 years</option>
+														<option value="4">5 years</option>
+														<option value="3">4 years</option>
+														<option value="2">3 years</option>
+														<option value="1">2 years</option>
+														<option value="0">1 year</option>
+													</select>
+
+												</div>
+											</div>
+										</div>
+										<div class="col-12">
+											<div class="form-group">
+												<label class="form-label small mb-1">Extra monthly payment</label>
+												<div class="position-relative d-flex align-items-center">
+													<span class="position-absolute small ms-2 ps-1">$</span>
+													<input
+														type="text"
+														class="form-control-sm border-1 border-grey mw-100 w-100 ps-4"
+														value={snap.extraMonthlyPayment}
+														onChange={handleExtraMonthlyPaymentChange}
+													/>
+												</div>
+											</div>
+										</div>
+										{snap.error && (
+											<div class="col-12">
+												<div class="text-warning">{snap.error}</div>
+											</div>
+										)}
+										<div class="col-12">
+											<button
+												class="btn btn-primary w-100"
+												type="submit"
+											>
+												Calculate
+											</button>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+						<div class="col-lg-8">
+							<div class="row gy-4">
+								<div class="col-md-4">
+									<div class="card text-center p-4">
+										<div class="small">Monthly payment</div>
+										<div class="fw-semibold">{snap.results.monthlyPayment}</div>
+									</div>
+								</div>
+								<div class="col-md-4">
+									<div class="card text-center p-4">
+										<div class="small">Total paid</div>
+										<div class="fw-semibold">{snap.results.totalPaid}</div>
+									</div>
+								</div>
+								<div class="col-md-4">
+									<div class="card text-center p-4">
+										<div class="small">Total years</div>
+										<div class="fw-semibold">{snap.results.totalYears}</div>
+									</div>
+								</div>
+								<div class="col-12">
+									<div class="card p-4">
+										<canvas
+											ref={canvasRef}
+											width="800"
+											height="400"
+											class="max-w-full"
+										/>
+									</div>
+								</div>
+								<div class="col-12">
+									<div class="card p-4">
+										<div class="overflow-auto mw-100">
+											<table class="table table-bordered mb-0">
+												<thead>
+													<tr>
+														<th class="fw-semibold">Year</th>
+														<th class="fw-semibold">Interest</th>
+														<th class="fw-semibold">Principal</th>
+														<th class="fw-semibold">Ending balance</th>
+													</tr>
+												</thead>
+												<tbody>
+													{snap.results.tableData?.map(
+														({ interest, principal, principalBalance }, index) => (
+															<tr key={index}>
+																<td>{index + 1}</td>
+																<td>{interest}</td>
+																<td>{principal}</td>
+																<td>{principalBalance}</td>
+															</tr>
+														)
+													)}
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
   );
 };

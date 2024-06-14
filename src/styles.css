@@ -14,3 +14,11 @@ body {
 .__border {
   /* @apply border border-zinc-300 dark:border-zinc-500; */
 }
+
+.form-control-sm{
+  border-style: solid;
+}
+
+.border-grey{
+  border-color: rgba(0, 0, 0, 0.175);
+}
