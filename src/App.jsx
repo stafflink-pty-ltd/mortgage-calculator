@@ -223,21 +223,20 @@ export const App = () => {
   useLayoutEffect(handleSubmit, []);
 
   return (
-    <div className="p-4 lg:p-16">
-      <div className="text-zinc-400 text-xl mb-4 lg:mb-8 text-center">
-        Mortgage Calculator
+    <div className="container pt-5">
+      <div class="row">
+        <div class="col">
+          <h1>Mortgage Calculator</h1>
+        </div>
       </div>
-      <div className="flex justify-center">
+      <div className="row">
         <div className="flex flex-col lg:flex-row justify-center gap-8 max-w-[1400px]">
           <div className="flex flex-col gap-8 flex-1 h-fit">
-            <form
-              className="p-4 lg:p-8 __border rounded"
-              onSubmit={handleSubmit}
-            >
+            <form onSubmit={handleSubmit}>
               <div className="flex flex-col gap-2 text-sm mb-8">
                 <div className="flex gap-4">
                   <div className="flex flex-col flex-[3]">
-                    <label className="text-zinc-400">Loan amount</label>
+                    <label className="form-label">Loan amount</label>
                     <div className="relative">
                       <div className="absolute left-1 top-[5px]">$</div>
                       <input
@@ -249,7 +248,7 @@ export const App = () => {
                     </div>
                   </div>
                   <div className="flex flex-col flex-1">
-                    <label className="text-zinc-400">Interest</label>
+                    <label className="form-label">Interest</label>
                     <div className="relative">
                       <div className="absolute right-1 top-[5px]">%</div>
                       <input
